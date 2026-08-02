@@ -2,7 +2,7 @@
 2.bin		：是存放debug和release
 3.build		：存放.sln
 4.doc		：文档说明
-5.include	：
-6.src		：里面存放具体项目（自己有exe,lib,dll）
+//5.include	：
+6.src		：里面存放具体项目（每个里面都有自己的CMakelists.txt）（自己有exe,lib,dll）
 7.tests		：测试代码
 8.thirdparty：第三方库
