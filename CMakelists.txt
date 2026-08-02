@@ -53,7 +53,7 @@ set_vs_output_dir(glfw)
 
 # glad源码 直接并入主程序，不单独建库
 set(GLAD_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/glad)
-set(GLAD_ROOT ${GLAD_ROOT}/src/glad.c)
+# set(GLAD_ROOT ${GLAD_ROOT}/src/glad.c)
 
 # 引入src下所有业务子项目
 add_subdirectory(src/main)

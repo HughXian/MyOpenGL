@@ -27,7 +27,13 @@ file(GLOB_RECURSE MAIN_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
 )
 
-add_executable(OpenGLMain ${MAIN_SOURCES})
+#手动加glad.c
+set(GLAD_SOURCE ${GLAD_ROOT}/src/glad.c)
+
+add_executable(OpenGLMain 
+    ${MAIN_SOURCES}
+    ${GLAD_SOURCE}
+)
 
 # VS筛选器：自动映射磁盘真实目录结构
 source_group(
@@ -35,6 +41,9 @@ source_group(
     PREFIX ""
     FILES ${MAIN_SOURCES}
 )
+
+#额外给glad单独创建vs筛选器，方便查看
+source_group("thirdparty/glad" FILES ${GLAD_SOURCE})
 
 # 设置输出目录
 set_vs_output_dir(OpenGLMain)
