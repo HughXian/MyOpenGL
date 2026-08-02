@@ -1,0 +1,65 @@
+cmake_minimum_required(VERSION 3.18)
+
+project(MyOpenGL LANGUAGES C CXX)
+
+# C++标准
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# -----------全局输出路径
+# 函数：自动转换vs平台名称 win32 -> x86
+function(set_vs_output_dir target_name)
+    if(MSVC)
+        #获取 当前sln平台
+        if(CMAKE_VS_PLATFORM_NAME STREQUAL "WIN32")
+            set(PLATFORM_NAME "X86")
+        elseif(CMAKE_VS_PLATFORM_NAME STREQUAL "X64")
+            set(PLATFORM_NAME "X64")
+        else()
+            set(PLATFORM_NAME ${CMAKE_VS_PLATFORM_NAME})
+        endif()
+
+        #拼接路径
+        set(RUNTIME_OUTPUT  "${CMAKE_SOURCE_DIR}/bin/${PLATFORM_NAME}/$<CONFIG>")
+        set(ARCHIVE_OUT     "${CMAKE_BINARY_DIR}/lib/${PLATFORM_NAME}/$<CONFIG>")
+        set(PDB_OUT         "${CMAKE_SOURCE_DIR}/bin/${PLATFORM_NAME}/$<CONFIG>")
+
+        # 给目标单独设置输出目录
+        set_target_properties(${target_name} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY    ${RUNTIME_OUTPUT}
+            LIBRARY_OUTPUT_DIRECTORY    ${RUNTIME_OUTPUT}
+            ARCHIVE_OUTPUT_DIRECTORY    ${ARCHIVE_OUT}
+            PDB_OUTPUT_DIRECTORY        ${PDB_OUT}
+            )
+
+    endif()
+
+endfunction()
+#glfw源码编译为 静态库
+set(GLFW_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/glfw)
+
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+
+# 进入glfw源码目录执行它自带的cmakelist
+add_subdirectory(${GLFW_ROOT})
+
+
+# glfw目标名称就是 glfw，设置输出目录
+set_vs_output_dir(glfw)
+
+# glad源码 直接并入主程序，不单独建库
+set(GLAD_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/glad)
+set(GLAD_ROOT ${GLAD_ROOT}/src/glad.c)
+
+# 引入src下所有业务子项目
+add_subdirectory(src/main)
+# 后续新增模块直接在这里追加
+# add_subdirectory(src/GameCore)
+# add_subdirectory(src/Player)
+
+# VS 默认启动项目（目标名称在src/main内定义）
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT OpenGLMain)

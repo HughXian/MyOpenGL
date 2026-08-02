@@ -1,0 +1,66 @@
+# 当前路径：src/main
+set(GLAD_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/glad)
+
+# add_executable(OpenGLMain
+#     main.cpp
+#      # 后续main文件夹新增文件直接在此追加
+#     # other.cpp
+# )
+
+# ===================== VS筛选器：映射真实磁盘目录 =====================
+# 以当前 src/main 作为根目录，文件自动生成对应层级筛选器
+# source_group(
+#     TREE ${CMAKE_CURRENT_LIST_DIR}
+#     PREFIX ""
+#     FILES
+#         main.cpp
+#         # !!! 新增cpp/h头文件时，这里同步追加，source_group才能识别
+#         # other.cpp
+# )
+# ====================================================================
+
+# 自动搜集当前目录源码
+file(GLOB_RECURSE MAIN_SOURCES CONFIGURE_DEPENDS
+    LIST_DIRECTORIES FALSE
+    "${CMAKE_CURRENT_LIST_DIR}/*.h"
+    "${CMAKE_CURRENT_LIST_DIR}/*.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
+)
+
+add_executable(OpenGLMain ${MAIN_SOURCES})
+
+# VS筛选器：自动映射磁盘真实目录结构
+source_group(
+    TREE ${CMAKE_SOURCE_DIR}/src
+    PREFIX ""
+    FILES ${MAIN_SOURCES}
+)
+
+# 设置输出目录
+set_vs_output_dir(OpenGLMain)
+
+# 头文件路径
+target_include_directories(OpenGLMain PRIVATE
+    ${GLAD_ROOT}/include
+    ${GLFW_ROOT}/include
+    # 如果后续依赖自己写的模块：
+    # ${CMAKE_SOURCE_DIR}/src/GameCore
+)
+
+# 链接外部库
+target_link_libraries(OpenGLMain PRIVATE
+    glfw
+    # 后续自己写的业务静态库在这里追加
+    # GameCore
+    # Render
+)
+
+# Windows系统依赖
+if(WIN32)
+    target_link_libraries(OpenGLMain PRIVATE 
+        opengl32 
+        gdi32 
+        user32 
+        shell32
+    )
+endif()
