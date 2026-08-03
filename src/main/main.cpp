@@ -2,6 +2,7 @@
 #include <string>
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include <cmath>
 
 void CB_FramebufferSize(GLFWwindow* window,int width, int height)
 {
@@ -11,6 +12,15 @@ void CB_FramebufferSize(GLFWwindow* window,int width, int height)
         return;
     }
     std::cout << "[error]:window is nullptr" << std::endl;
+}
+
+void ProcessInput(GLFWwindow* window)
+{
+    //检查用户是否按下了 esc
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
 }
 
 int main()
@@ -31,8 +41,8 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //创建一个窗口对象，存放了所有和窗口相关的数据，并且被GLFW的其他函数频繁地用到
-    int windowWeight = 1600;
-    int windowHeight = 800;
+    int windowWeight = 800;
+    int windowHeight = 600;
     //std::string titleName = "这是OpenGL的窗口";
     std::string titleName = "中文";
     GLFWwindow* window = glfwCreateWindow(windowWeight, windowHeight, titleName.c_str(), nullptr, nullptr);
@@ -58,12 +68,32 @@ int main()
 
     glfwSetFramebufferSizeCallback(window, CB_FramebufferSize);
 
-
+    float red = 0.0f;
+    float green = 0.0f;
+    float blue = 0.0f;
+    float alpha = 0.0f;
+    float time = 0.0f;
     //渲染循环
     //在我们每次循环的开始前检查一次GLFW是否被要求退出，
     // 如果是的话，该函数返回true，渲染循环将停止运行，之后我们就可以关闭应用程序。
     while (!glfwWindowShouldClose(window))
     {
+        //检测用户输入
+        ProcessInput(window);
+
+        time = fmodf(time, 6.28319f);
+        time += 0.02f;
+        red = 0.5f * sinf(time) + 0.5f;
+        green = 0.5f * sinf(time * 2.0f) + 0.5f;
+        blue = 0.5f * sinf(time * 3.0f) + 0.5f;
+        //渲染指令
+        // 设置清空屏幕所用的颜色，当调用glClear函数，清除颜色缓冲之后，整个颜色缓冲都会被
+        // 填充为 glClearColor里所设置的颜色
+        glClearColor(red, green, blue, 1.0f);
+        //glClear函数来清空 屏幕的颜色缓冲，接受一个缓冲位（Buffer Bit）来指定要清空的缓冲
+        //可以有 颜色缓冲 GL_COLOR_BUFFER_BIT
+        glClear(GL_COLOR_BUFFER_BIT);
+
         //函数检查有没有触发什么事件（比如键盘输入、鼠标移动等）、更新窗口状态，
         // 并调用对应的回调函数（可以通过回调方法手动设置）
         glfwSwapBuffers(window);
