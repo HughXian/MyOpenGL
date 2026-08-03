@@ -19,6 +19,10 @@ int main()
 
     //glfwInit 来初始化GLFW
     glfwInit();
+
+    //version_major 叫做 主版本
+    //version minor 叫做 次版本
+    // 拿下面的来看就是 OpenGL 的 3.3版本
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
