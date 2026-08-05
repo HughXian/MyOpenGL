@@ -141,5 +141,53 @@ int main()
         //现在我们已经把顶点数据储存在显卡的内存中，用VBO这个顶点缓冲对象管理。下面我们会创建一个顶点着色器和片段着色器来真正处理这些数据
 
 
+    // 暂时将顶点着色器的源代码硬编码在代码文件顶部的C风格字符串中
+    const char* vertexShaderSource = "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "}\0";
+
+    // 为了能够让OpenGL使用它，我们必须在运行时动态编译它的源代码。
+
+    //我们首先要做的是创建一个着色器对象，注意还是用ID来引用的。
+    // 所以我们储存这个顶点着色器为unsigned int，然后用glCreateShader创建这个着色器
+
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    // 我们把需要创建的着色器类型以参数形式提供给glCreateShader。
+    // 由于我们正在创建一个顶点着色器，传递的参数是GL_VERTEX_SHADER
+
+    // 下一步我们把这个着色器源码附加到着色器对象上，然后编译它
+
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    // glShaderSource函数把要编译的着色器对象作为第一个参数。
+    // 第二参数指定了传递的源码字符串数量，这里只有一个。
+    // 第三个参数是顶点着色器真正的源码，
+    // 第四个参数我们先设置为NULL
+
+    //你可能会希望检测在调用glCompileShader后编译是否成功了，
+    // 如果没成功的话，你还会希望知道错误是什么，这样你才能修复它们。
+    // 检测编译时错误可以通过以下代码来实现：
+
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    //首先我们定义一个整型变量来表示是否成功编译，还定义了一个储存错误消息（如果有的话）的容器。
+    // 然后我们用glGetShaderiv检查是否编译成功。
+    // 如果编译失败，我们会用glGetShaderInfoLog获取错误消息，然后打印它
+
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    //片段着色器
+    //片段着色器(Fragment Shader)是第二个也是最后一个我们打算创建的用于渲染三角形的着色器。
+    // 片段着色器所做的是计算像素最后的颜色输出
+
     return 0; 
 }
